@@ -565,14 +565,21 @@ def is_class_active(course_name):
     for cls in schedule:
         if cls["course"] == course_name:
             try:
-                start_time = datetime.strptime(cls["start"], "%H:%M").time()
-                end_time = datetime.strptime(cls["end"], "%H:%M").time()
+                start_time = datetime.strptime(cls["start"].strip(), "%H:%M").time()
+                end_time = datetime.strptime(cls["end"].strip(), "%H:%M").time()
             except ValueError:
                 return False
 
-            # Support both "day" (old single string) and "days" (new list)
-            days = cls.get("days") or [cls.get("day", "")]
-            return current_day in days and start_time <= current_time <= end_time
+            days = cls.get("days") or [cls.get("day", "").strip()]
+            days = [d.strip() for d in days if d.strip()]
+
+            # normal same-day class
+            if start_time <= end_time:
+                return current_day in days and start_time <= current_time <= end_time
+
+            # overnight class like 23:00 to 02:00
+            else:
+                return current_day in days and (current_time >= start_time or current_time <= end_time)
 
     return False
 
