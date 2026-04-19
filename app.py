@@ -627,7 +627,6 @@ def social_share_links(text):
 def render_share_buttons(text, key_suffix):
     links = social_share_links(text)
 
-    # Detect if this is a collection or streak share
     is_collection = text.startswith("🎴") or "cards collected" in text or "just started" in text
 
     clean = text
@@ -645,29 +644,29 @@ def render_share_buttons(text, key_suffix):
             rarity_counts[r] = rarity_counts.get(r, 0) + 1
 
         card_rows = "".join(f"""
-        <div style="display:flex;justify-content:space-between;align-items:center;
-                    background:rgba(255,255,255,0.55);border-radius:12px;
-                    padding:10px 16px;border:1.5px solid rgba(255,203,5,0.35);margin-bottom:8px;">
-            <span style="font-family:'Fredoka One',cursive;font-size:17px;color:#2a75bb;">{rarity}</span>
-            <span style="font-family:'Fredoka One',cursive;font-size:17px;color:#e67e00;">🎴 {count}</span>
-        </div>""" for rarity, count in rarity_counts.items()) if rarity_counts else f"""
-        <div style="background:rgba(255,255,255,0.55);border-radius:12px;padding:14px 16px;
-                    border:1.5px solid rgba(255,203,5,0.35);text-align:center;
-                    font-family:'Fredoka One',cursive;font-size:16px;color:#2a75bb;">
-            Just getting started! 🎴
-        </div>"""
+<div style="display:flex;justify-content:space-between;align-items:center;
+            background:rgba(255,255,255,0.55);border-radius:12px;
+            padding:10px 16px;border:1.5px solid rgba(255,203,5,0.35);margin-bottom:8px;">
+    <span style="font-family:'Fredoka One',cursive;font-size:17px;color:#2a75bb;">{rarity}</span>
+    <span style="font-family:'Fredoka One',cursive;font-size:17px;color:#e67e00;">🎴 {count}</span>
+</div>""" for rarity, count in rarity_counts.items()) if rarity_counts else """
+<div style="background:rgba(255,255,255,0.55);border-radius:12px;padding:14px 16px;
+            border:1.5px solid rgba(255,203,5,0.35);text-align:center;
+            font-family:'Fredoka One',cursive;font-size:16px;color:#2a75bb;">
+    Just getting started! 🎴
+</div>"""
 
         rows_html = f"""
-        <div style="display:flex;justify-content:space-between;align-items:center;
-                    background:rgba(255,255,255,0.55);border-radius:12px;
-                    padding:10px 16px;border:1.5px solid rgba(255,203,5,0.35);margin-bottom:8px;">
-            <span style="font-family:'Fredoka One',cursive;font-size:17px;color:#2a75bb;">Total cards</span>
-            <span style="font-family:'Fredoka One',cursive;font-size:17px;color:#e67e00;">🎴 {total}</span>
-        </div>{card_rows}"""
+<div style="display:flex;justify-content:space-between;align-items:center;
+            background:rgba(255,255,255,0.55);border-radius:12px;
+            padding:10px 16px;border:1.5px solid rgba(255,203,5,0.35);margin-bottom:8px;">
+    <span style="font-family:'Fredoka One',cursive;font-size:17px;color:#2a75bb;">Total cards</span>
+    <span style="font-family:'Fredoka One',cursive;font-size:17px;color:#e67e00;">🎴 {total}</span>
+</div>{card_rows}"""
         header_label = "Share my collection"
         subheader = "My Schedulémon Collection"
+
     else:
-        # Streak rows
         streak_lines = []
         for part in clean.split(" | "):
             part = part.strip()
@@ -684,61 +683,76 @@ def render_share_buttons(text, key_suffix):
             return f'<span class="{css_class}">🔥</span>'
 
         rows_html = "".join(f"""
-        <div style="display:flex;justify-content:space-between;align-items:center;
-                    background:rgba(255,255,255,0.55);border-radius:12px;
-                    padding:10px 16px;border:1.5px solid rgba(255,203,5,0.35);margin-bottom:8px;">
-            <span style="font-family:'Fredoka One',cursive;font-size:17px;color:#2a75bb;">{c}</span>
-            <span style="font-family:'Fredoka One',cursive;font-size:17px;color:#e67e00;display:flex;align-items:center;gap:6px;">
-                {flame_html(n)} {n}
-            </span>
-        </div>""" for c, n in streak_lines)
+<div style="display:flex;justify-content:space-between;align-items:center;
+            background:rgba(255,255,255,0.55);border-radius:12px;
+            padding:10px 16px;border:1.5px solid rgba(255,203,5,0.35);margin-bottom:8px;">
+    <span style="font-family:'Fredoka One',cursive;font-size:17px;color:#2a75bb;">{c}</span>
+    <span style="font-family:'Fredoka One',cursive;font-size:17px;color:#e67e00;display:flex;align-items:center;gap:6px;">
+        {flame_html(n)} {n}
+    </span>
+</div>""" for c, n in streak_lines)
+
         header_label = "Share my streaks"
         subheader = "My Schedulémon streaks"
 
     flame_style = """
-    <style>
-    @keyframes flicker {
-        0%   { transform: scale(1)    rotate(-2deg); opacity: 1;    }
-        25%  { transform: scale(1.15) rotate(2deg);  opacity: 0.9;  }
-        50%  { transform: scale(0.95) rotate(-1deg); opacity: 1;    }
-        75%  { transform: scale(1.1)  rotate(1deg);  opacity: 0.85; }
-        100% { transform: scale(1)    rotate(-2deg); opacity: 1;    }
-    }
-    @keyframes flare {
-        0%   { transform: scale(1);    filter: brightness(1);   }
-        50%  { transform: scale(1.5);  filter: brightness(1.4); }
-        100% { transform: scale(1);    filter: brightness(1);   }
-    }
-    .flame-base { display:inline-block;font-size:20px;animation:flicker 1.2s ease-in-out infinite;transform-origin:bottom center; }
-    .flame-active { animation:flicker 1.2s ease-in-out infinite,flare 0.6s ease-out 1;transform-origin:bottom center; }
-    </style>
-    """
+<style>
+@keyframes flicker {
+    0%   { transform: scale(1) rotate(-2deg); opacity: 1; }
+    25%  { transform: scale(1.15) rotate(2deg); opacity: 0.9; }
+    50%  { transform: scale(0.95) rotate(-1deg); opacity: 1; }
+    75%  { transform: scale(1.1) rotate(1deg); opacity: 0.85; }
+    100% { transform: scale(1) rotate(-2deg); opacity: 1; }
+}
+@keyframes flare {
+    0%   { transform: scale(1); filter: brightness(1); }
+    50%  { transform: scale(1.5); filter: brightness(1.4); }
+    100% { transform: scale(1); filter: brightness(1); }
+}
+.flame-base {
+    display:inline-block;
+    font-size:20px;
+    animation:flicker 1.2s ease-in-out infinite;
+    transform-origin:bottom center;
+}
+.flame-active {
+    animation:flicker 1.2s ease-in-out infinite, flare 0.6s ease-out 1;
+    transform-origin:bottom center;
+}
+</style>
+"""
 
-    share_box_html = f"""
-    {flame_style}
-    <div style="background:#FFF8B5;border:3px solid #ffcb05;border-radius:22px;
-                padding:22px 24px 18px;font-family:'Fredoka One',cursive;">
-        <div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;
-                    color:#2a75bb;margin-bottom:10px;">{header_label}</div>
-        <div style="font-size:13px;color:#b8a000;margin-bottom:12px;">{subheader}</div>
-        {rows_html}
-    </div>
-    <div style="margin-bottom:14px;"></div>
-    """
+    share_box_html = f"""{flame_style}
+<div style="background:#FFF8B5;border:3px solid #ffcb05;border-radius:22px;
+            padding:22px 24px 18px;font-family:'Fredoka One',cursive;">
+    <div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;
+                color:#2a75bb;margin-bottom:10px;">{header_label}</div>
+    <div style="font-size:13px;color:#b8a000;margin-bottom:12px;">{subheader}</div>
+    {rows_html}
+</div>
+<div style="margin-bottom:14px;"></div>
+"""
 
     st.markdown(share_box_html, unsafe_allow_html=True)
-    
-    col1, col2, col3, col4 = st.columns(4)
-    with col1: st.link_button("Share on X", links["x"], use_container_width=True)
-    with col2: st.link_button("Facebook", links["facebook"], use_container_width=True)
-    with col3: st.link_button("WhatsApp", links["whatsapp"], use_container_width=True)
-    with col4: st.link_button("Telegram", links["telegram"], use_container_width=True)
 
-    st.download_button("⬇ Download share text", data=text,
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.link_button("Share on X", links["x"], use_container_width=True)
+    with col2:
+        st.link_button("Facebook", links["facebook"], use_container_width=True)
+    with col3:
+        st.link_button("WhatsApp", links["whatsapp"], use_container_width=True)
+    with col4:
+        st.link_button("Telegram", links["telegram"], use_container_width=True)
+
+    st.download_button(
+        "⬇ Download share text",
+        data=text,
         file_name=f"schedulemon_share_{key_suffix}.txt",
-        mime="text/plain", use_container_width=True,
-        key=f"download_share_{key_suffix}")
-# ── CSS / JS ──────────────────────────────────────────────────────────────────
+        mime="text/plain",
+        use_container_width=True,
+        key=f"download_share_{key_suffix}"
+    )# ── CSS / JS ──────────────────────────────────────────────────────────────────
 CARD_CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;700;900&display=swap');
