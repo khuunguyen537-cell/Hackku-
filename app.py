@@ -487,11 +487,11 @@ defaults = {
     "editing_index": None,     # NEW — tracks whether GPS passed for this attempt
     "schedule": [
         {"course": "CHEM 135", "day": "Saturday", "start": "00:00", "end": "18:00",
-         "location": "Demo Hall",    "lat": 38.9541, "lon": -95.2558, "radius": 80},
+         "location": "Demo Hall",    "lat": 38.9541, "lon": -95.2558, "radius": 110},
         {"course": "MATH 125", "day": "Friday",   "start": "11:00", "end": "12:15",
-         "location": "Math Building","lat": 38.9555, "lon": -95.2520, "radius": 80},
+         "location": "Math Building","lat": 38.9555, "lon": -95.2520, "radius": 110},
         {"course": "BIOL 240", "day": "Friday",   "start": "14:00", "end": "14:50",
-         "location": "Bio Room 101", "lat": 38.9530, "lon": -95.2545, "radius": 80},
+         "location": "Bio Room 101", "lat": 38.9530, "lon": -95.2545, "radius": 110},
     ],
 }
 for k, v in defaults.items():
@@ -525,7 +525,7 @@ def is_user_at_hall(user_lat, user_lon, course_name):
     if not cls or "lat" not in cls:
         return True, 0
     dist = haversine_distance(user_lat, user_lon, cls["lat"], cls["lon"])
-    return dist <= cls.get("radius", 80), round(dist)
+    return dist <= cls.get("radius", 110), round(dist)
 
 def geocode_location_name(location_name):
     try:
@@ -1292,7 +1292,7 @@ elif page == "My Schedule":
                 if lat is not None and lon is not None:
                     new_cls["lat"] = lat
                     new_cls["lon"] = lon
-                    new_cls["radius"] = 80
+                    new_cls["radius"] = 110
                 else:
                     st.warning("Could not find coordinates.")
 
@@ -1433,7 +1433,7 @@ elif page == "My Schedule":
                             if lat is not None and lon is not None:
                                 updated_cls["lat"] = lat
                                 updated_cls["lon"] = lon
-                                updated_cls["radius"] = 80
+                                updated_cls["radius"] = 110
                             else:
                                 updated_cls["radius"] = cls.get("radius", 80)
                             st.session_state.schedule[i] = updated_cls
