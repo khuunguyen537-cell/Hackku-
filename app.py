@@ -4,6 +4,7 @@ from streamlit_autorefresh import st_autorefresh
 from streamlit_js_eval import get_geolocation 
 from geopy.geocoders import Nominatim  # NEW
 from datetime import datetime
+from zoneinfo import ZoneInfo
 import math                                      # NEW
 import random
 import urllib.parse
@@ -558,7 +559,7 @@ def pull_random_card():
     return {"name": name_map[rarity], "rarity": rarity}
 
 def is_class_active(course_name):
-    now = datetime.now()
+    now = datetime.now(ZoneInfo("America/Chicago"))
     current_day = now.strftime("%A")
     current_time = now.time()
 
@@ -573,11 +574,8 @@ def is_class_active(course_name):
             days = cls.get("days") or [cls.get("day", "").strip()]
             days = [d.strip() for d in days if d.strip()]
 
-            # normal same-day class
             if start_time <= end_time:
                 return current_day in days and start_time <= current_time <= end_time
-
-            # overnight class like 23:00 to 02:00
             else:
                 return current_day in days and (current_time >= start_time or current_time <= end_time)
 
