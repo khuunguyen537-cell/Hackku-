@@ -487,11 +487,11 @@ defaults = {
     "editing_index": None,     # NEW — tracks whether GPS passed for this attempt
     "schedule": [
         {"course": "CHEM 135", "day": "Saturday", "start": "00:00", "end": "18:00",
-         "location": "Demo Hall",    "lat": 38.9541, "lon": -95.2558, "radius": 80},
+         "location": "Demo Hall",    "lat": 38.9541, "lon": -95.2558, "radius": 50},
         {"course": "MATH 125", "day": "Friday",   "start": "11:00", "end": "12:15",
-         "location": "Math Building","lat": 38.9555, "lon": -95.2520, "radius": 80},
+         "location": "Math Building","lat": 38.9555, "lon": -95.2520, "radius": 50},
         {"course": "BIOL 240", "day": "Friday",   "start": "14:00", "end": "14:50",
-         "location": "Bio Room 101", "lat": 38.9530, "lon": -95.2545, "radius": 80},
+         "location": "Bio Room 101", "lat": 38.9530, "lon": -95.2545, "radius": 50},
     ],
 }
 for k, v in defaults.items():
@@ -525,7 +525,7 @@ def is_user_at_hall(user_lat, user_lon, course_name):
     if not cls or "lat" not in cls:
         return True, 0
     dist = haversine_distance(user_lat, user_lon, cls["lat"], cls["lon"])
-    return dist <= cls.get("radius", 80), round(dist)
+    return dist <= cls.get("radius", 50), round(dist)
 
 def geocode_location_name(location_name):
     try:
@@ -1126,7 +1126,7 @@ if page == "Check In":
                         st.markdown(gps_box(
                             "🚫", "#c0392b", "#ffeaea", "#e74c3c",
                             "You're not at the lecture hall!",
-                            f"You are {distance}m away — must be within {cls_info.get('radius', 80)}m of {cls_info.get('location', 'the hall')}."
+                            f"You are {distance}m away — must be within {cls_info.get('radius', 50)}m of {cls_info.get('location', 'the hall')}."
                         ), unsafe_allow_html=True)
                         st.markdown("""
                         <p style='color:#5a7fa8;font-family:Fredoka One,cursive;font-size:15px;'>
@@ -1274,7 +1274,6 @@ elif page == "My Schedule":
             "Location Name",
             placeholder="e.g. Snow Hall, University of Kansas"
         )
-        radius = st.text_input("Radius (m)", value="80")
 
         submitted = st.form_submit_button("Add Class")
 
@@ -1293,10 +1292,7 @@ elif page == "My Schedule":
                 if lat is not None and lon is not None:
                     new_cls["lat"] = lat
                     new_cls["lon"] = lon
-                    try:
-                        new_cls["radius"] = int(radius.strip()) if radius.strip() else 80
-                    except ValueError:
-                        new_cls["radius"] = 80
+                    new_cls["radius"] = 50
                 else:
                     st.warning("Could not find coordinates.")
 
@@ -1314,7 +1310,7 @@ elif page == "My Schedule":
         for i, cls in enumerate(st.session_state.schedule):
             has_gps = "lat" in cls and "lon" in cls
             gps_line = (
-                f"🛰️ {cls['lat']:.4f}, {cls['lon']:.4f} · radius {cls.get('radius', 80)}m"
+                f"🛰️ {cls['lat']:.4f}, {cls['lon']:.4f} · radius {cls.get('radius', 50)}m"
                 if has_gps else "🛰️ No GPS coordinates — location check skipped"
             )
 
@@ -1415,7 +1411,6 @@ elif page == "My Schedule":
                         edit_end = st.text_input("End Time (HH:MM)", value=cls.get("end", ""))
 
                     edit_location = st.text_input("Location Name", value=cls.get("location", ""))
-                    edit_radius = st.text_input("Radius (m)", value=str(cls.get("radius", 80)))
 
                     action_col1, action_col2 = st.columns(2)
                     with action_col1:
@@ -1438,16 +1433,9 @@ elif page == "My Schedule":
                             if lat is not None and lon is not None:
                                 updated_cls["lat"] = lat
                                 updated_cls["lon"] = lon
-                                try:
-                                    updated_cls["radius"] = int(edit_radius.strip()) if edit_radius.strip() else 80
-                                except ValueError:
-                                    updated_cls["radius"] = 80
+                                updated_cls["radius"] = 50
                             else:
                                 updated_cls["radius"] = cls.get("radius", 80)
-                                if "lat" in cls and "lon" in cls:
-                                    updated_cls["lat"] = cls["lat"]
-                                    updated_cls["lon"] = cls["lon"]
-
                             st.session_state.schedule[i] = updated_cls
 
                             if edit_course.strip() not in st.session_state.streaks:
